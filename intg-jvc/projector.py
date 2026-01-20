@@ -53,6 +53,10 @@ class JVCProjector(StatelessHTTPDevice):
             SOURCE_LIST=self._source_list,
         )
 
+        # Concurrency control
+        self._lock = asyncio.Lock()
+        self._sensor_update_task: asyncio.Task | None = None
+
     @property
     def identifier(self) -> str:
         """Return the device identifier."""
@@ -130,7 +134,8 @@ class JVCProjector(StatelessHTTPDevice):
             ]:
                 sensor = self.sensors.get(sensor_id)
                 if sensor and sensor.query_command:
-                    sensor.value = await self._jvc_projector.ref(sensor.query_command)
+                    async with self._lock:
+                        sensor.value = await self._jvc_projector.ref(sensor.query_command)
                     await asyncio.sleep(0.1)
 
             # Call refresh_state on registered sensor entities
@@ -160,7 +165,8 @@ class JVCProjector(StatelessHTTPDevice):
                 return
 
             # Query the specific sensor value and store in sensor config
-            sensor.value = await self._jvc_projector.ref(sensor.query_command)
+            async with self._lock:
+                sensor.value = await self._jvc_projector.ref(sensor.query_command)
 
             # Trigger sensor entity update if it exists
             if sensor.entity:
@@ -227,12 +233,14 @@ class JVCProjector(StatelessHTTPDevice):
         )
 
         try:
-            await self._jvc_projector.connect()
-
-            state_dict = await self._jvc_projector.get_state()
+            async with self._lock:
+                await self._jvc_projector.connect()
+                state_dict = await self._jvc_projector.get_state()
 
             # Update sensors in background task with delays
-            asyncio.create_task(self._update_all_sensors())
+            # Prevent stacking tasks
+            if self._sensor_update_task is None or self._sensor_update_task.done():
+                self._sensor_update_task = asyncio.create_task(self._update_all_sensors())
 
             power_str = str(state_dict.get("power", ""))
             self._state = self._convert_power_state(power_str)
@@ -299,64 +307,70 @@ class JVCProjector(StatelessHTTPDevice):
 
             match command:
                 case "powerOn":
-                    power = await self._jvc_projector.get_power()
-                    # Normalize power state from API
-                    power_state = self._convert_power_state(str(power))
-                    if power_state in [
-                        media_player.States.STANDBY,
-                        media_player.States.OFF,
-                    ]:
-                        await self._jvc_projector.power_on()
+                    async with self._lock:
+                        power = await self._jvc_projector.get_power()
+                        # Normalize power state from API
+                        power_state = self._convert_power_state(str(power))
+                        if power_state in [
+                            media_player.States.STANDBY,
+                            media_player.States.OFF,
+                        ]:
+                            await self._jvc_projector.power_on()
                     self._state = media_player.States.ON
                     self.attributes.STATE = media_player.States.ON
 
                 case "powerOff":
-                    power = await self._jvc_projector.get_power()
-                    # Normalize power state from API
-                    power_state = self._convert_power_state(str(power))
-                    if power_state == media_player.States.ON:
-                        await self._jvc_projector.power_off()
+                    async with self._lock:
+                        power = await self._jvc_projector.get_power()
+                        # Normalize power state from API
+                        power_state = self._convert_power_state(str(power))
+                        if power_state == media_player.States.ON:
+                            await self._jvc_projector.power_off()
                     self._state = media_player.States.STANDBY
                     self.attributes.STATE = media_player.States.STANDBY
 
                 case "powerToggle":
-                    power = await self._jvc_projector.get_power()
-                    # Normalize power state from API
-                    power_state = self._convert_power_state(str(power))
-                    if power_state == media_player.States.ON:
-                        await self._jvc_projector.power_off()
-                        self._state = media_player.States.STANDBY
-                        self.attributes.STATE = media_player.States.STANDBY
-                    elif power_state in [
-                        media_player.States.STANDBY,
-                        media_player.States.OFF,
-                    ]:
-                        await self._jvc_projector.power_on()
-                        self._state = media_player.States.ON
-                        self.attributes.STATE = media_player.States.ON
-                    else:
-                        self._state = power_state
-                        self.attributes.STATE = power_state
+                    async with self._lock:
+                        power = await self._jvc_projector.get_power()
+                        # Normalize power state from API
+                        power_state = self._convert_power_state(str(power))
+                        if power_state == media_player.States.ON:
+                            await self._jvc_projector.power_off()
+                            self._state = media_player.States.STANDBY
+                            self.attributes.STATE = media_player.States.STANDBY
+                        elif power_state in [
+                            media_player.States.STANDBY,
+                            media_player.States.OFF,
+                        ]:
+                            await self._jvc_projector.power_on()
+                            self._state = media_player.States.ON
+                            self.attributes.STATE = media_player.States.ON
+                        else:
+                            self._state = power_state
+                            self.attributes.STATE = power_state
 
                 case "setInput":
                     code = JvcConst.REMOTE_HDMI_1  # Default to HDMI1
                     source = kwargs.get("source", "")
                     if source.upper() == "HDMI2":
                         code = JvcConst.REMOTE_HDMI_2
-                    await self._jvc_projector.remote(code)
+                    async with self._lock:
+                        await self._jvc_projector.remote(code)
                     self._active_source = kwargs["source"].upper()
                     self.attributes.SOURCE = self._active_source
 
                 case "remote":
                     code = kwargs.get("code")
                     if code:
-                        await self._jvc_projector.remote(str(code))
+                        async with self._lock:
+                            await self._jvc_projector.remote(str(code))
                     # Remote commands don't update attributes
 
                 case "operation":
                     code = kwargs.get("code")
                     if code:
-                        await self._jvc_projector.op(str(code))
+                        async with self._lock:
+                            await self._jvc_projector.op(str(code))
                     # Operation commands don't update attributes
 
                 case _:
