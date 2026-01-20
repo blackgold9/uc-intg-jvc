@@ -8,17 +8,18 @@ import asyncio
 import logging
 from typing import Any
 
-import ucapi
-import projector
-from const import (
-    SimpleCommands,
-    JVCConfig,
-)
 import const
-from ucapi import MediaPlayer, media_player, EntityTypes
-from ucapi.media_player import DeviceClasses, Attributes
-from jvcprojector import const as JvcConst
-from ucapi_framework import create_entity_id, Entity as FrameworkEntity
+import projector
+import ucapi
+from const import (
+    JVCConfig,
+    SimpleCommands,
+)
+from jvcprojector import command
+from ucapi import EntityTypes, MediaPlayer, media_player
+from ucapi.media_player import Attributes, DeviceClasses
+from ucapi_framework import Entity as FrameworkEntity
+from ucapi_framework import create_entity_id
 
 _LOG = logging.getLogger(__name__)
 
@@ -96,21 +97,21 @@ class JVCMediaPlayer(MediaPlayer, FrameworkEntity):
                     res = await jvc.send_command("powerToggle")
                     state_changed = True
                 case media_player.Commands.CURSOR_UP:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_UP)
+                    res = await jvc.send_command("remote", code=command.Remote.UP)
                 case media_player.Commands.CURSOR_DOWN:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_DOWN)
+                    res = await jvc.send_command("remote", code=command.Remote.DOWN)
                 case media_player.Commands.CURSOR_LEFT:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_LEFT)
+                    res = await jvc.send_command("remote", code=command.Remote.LEFT)
                 case media_player.Commands.CURSOR_RIGHT:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_RIGHT)
+                    res = await jvc.send_command("remote", code=command.Remote.RIGHT)
                 case media_player.Commands.CURSOR_ENTER:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_OK)
+                    res = await jvc.send_command("remote", code=command.Remote.OK)
                 case media_player.Commands.BACK:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_BACK)
+                    res = await jvc.send_command("remote", code=command.Remote.BACK)
                 case media_player.Commands.INFO:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_INFO)
+                    res = await jvc.send_command("remote", code=command.Remote.INFO)
                 case media_player.Commands.MENU:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_MENU)
+                    res = await jvc.send_command("remote", code=command.Remote.MENU)
                 case media_player.Commands.SELECT_SOURCE:
                     if params:
                         await jvc.send_command(
@@ -121,56 +122,56 @@ class JVCMediaPlayer(MediaPlayer, FrameworkEntity):
                         state_changed = True
                 case SimpleCommands.REMOTE_ADVANCED_MENU:
                     res = await jvc.send_command(
-                        "remote", code=JvcConst.REMOTE_ADVANCED_MENU
+                        "remote", code=command.Remote.ADVANCED_MENU
                     )
                 case SimpleCommands.REMOTE_PICTURE_MODE:
                     res = await jvc.send_command(
-                        "remote", code=JvcConst.REMOTE_PICTURE_MODE
+                        "remote", code=command.Remote.PICTURE_MODE
                     )
                 case SimpleCommands.REMOTE_COLOR_PROFILE:
                     res = await jvc.send_command(
-                        "remote", code=JvcConst.REMOTE_COLOR_PROFILE
+                        "remote", code=command.Remote.COLOR_PROFILE
                     )
                 case SimpleCommands.REMOTE_LENS_CONTROL:
                     res = await jvc.send_command(
-                        "remote", code=JvcConst.REMOTE_LENS_CONTROL
+                        "remote", code=command.Remote.LENS_CONTROL
                     )
                 case SimpleCommands.REMOTE_SETTING_MEMORY:
                     res = await jvc.send_command(
-                        "remote", code=JvcConst.REMOTE_SETTING_MEMORY
+                        "remote", code=command.Remote.SETTING_MEMORY
                     )
                 case SimpleCommands.REMOTE_GAMMA_SETTINGS:
                     res = await jvc.send_command(
-                        "remote", code=JvcConst.REMOTE_GAMMA_SETTINGS
+                        "remote", code=command.Remote.GAMMA_SETTINGS
                     )
                 case SimpleCommands.REMOTE_CMD:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_CMD)
+                    res = await jvc.send_command("remote", code=command.Remote.CMD)
                 case SimpleCommands.REMOTE_MODE_1:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_MODE_1)
+                    res = await jvc.send_command("remote", code=command.Remote.MODE_1)
                 case SimpleCommands.REMOTE_MODE_2:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_MODE_2)
+                    res = await jvc.send_command("remote", code=command.Remote.MODE_2)
                 case SimpleCommands.REMOTE_MODE_3:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_MODE_3)
+                    res = await jvc.send_command("remote", code=command.Remote.MODE_3)
                 case SimpleCommands.REMOTE_LENS_AP:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_LENS_AP)
+                    res = await jvc.send_command("remote", code=command.Remote.LENS_APERTURE)
                 case SimpleCommands.REMOTE_ANAMO:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_ANAMO)
+                    res = await jvc.send_command("remote", code=command.Remote.ANAMORPHIC)
                 case SimpleCommands.REMOTE_GAMMA:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_GAMMA)
+                    res = await jvc.send_command("remote", code=command.Remote.GAMMA)
                 case SimpleCommands.REMOTE_COLOR_TEMP:
                     res = await jvc.send_command(
-                        "remote", code=JvcConst.REMOTE_COLOR_TEMP
+                        "remote", code=command.Remote.COLOR_TEMP
                     )
                 case SimpleCommands.REMOTE_3D_FORMAT:
                     res = await jvc.send_command(
-                        "remote", code=JvcConst.REMOTE_3D_FORMAT
+                        "remote", code=command.Remote.V3D_FORMAT
                     )
                 case SimpleCommands.REMOTE_PIC_ADJ:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_PIC_ADJ)
+                    res = await jvc.send_command("remote", code=command.Remote.PICTURE_ADJUST)
                 case SimpleCommands.REMOTE_NATURAL:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_NATURAL)
+                    res = await jvc.send_command("remote", code=command.Remote.NATURAL)
                 case SimpleCommands.REMOTE_CINEMA:
-                    res = await jvc.send_command("remote", code=JvcConst.REMOTE_CINEMA)
+                    res = await jvc.send_command("remote", code=command.Remote.CINEMA)
                 case SimpleCommands.LENS_MEMORY_1:
                     asyncio.create_task(
                         jvc.send_command("operation", code=const.LENS_MEMORY_1)
