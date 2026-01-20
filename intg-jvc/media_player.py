@@ -287,6 +287,41 @@ class JVCMediaPlayer(MediaPlayer, FrameworkEntity):
                         "operation", code=const.PICTURE_MODE_PANA_PQ
                     )
                     asyncio.create_task(jvc.update_sensor("picture_mode"))
+                case SimpleCommands.PICTURE_MODE_FILMMAKER:
+                    res = await jvc.send_command(
+                        "operation", code=const.PICTURE_MODE_FILMMAKER
+                    )
+                    asyncio.create_task(jvc.update_sensor("picture_mode"))
+                case SimpleCommands.PICTURE_MODE_FRAME_ADAPT_HDR2:
+                    res = await jvc.send_command(
+                        "operation", code=const.PICTURE_MODE_FRAME_ADAPT_HDR2
+                    )
+                    asyncio.create_task(jvc.update_sensor("picture_mode"))
+                case SimpleCommands.PICTURE_MODE_FRAME_ADAPT_HDR3:
+                    res = await jvc.send_command(
+                        "operation", code=const.PICTURE_MODE_FRAME_ADAPT_HDR3
+                    )
+                    asyncio.create_task(jvc.update_sensor("picture_mode"))
+                case SimpleCommands.PICTURE_MODE_VIVID:
+                    res = await jvc.send_command(
+                        "operation", code=const.PICTURE_MODE_VIVID
+                    )
+                    asyncio.create_task(jvc.update_sensor("picture_mode"))
+                case SimpleCommands.PICTURE_MODE_NATURAL_LL:
+                    res = await jvc.send_command(
+                        "operation", code=const.PICTURE_MODE_NATURAL_LL
+                    )
+                    asyncio.create_task(jvc.update_sensor("picture_mode"))
+                case SimpleCommands.PICTURE_MODE_HDR10_LL:
+                    res = await jvc.send_command(
+                        "operation", code=const.PICTURE_MODE_HDR10_LL
+                    )
+                    asyncio.create_task(jvc.update_sensor("picture_mode"))
+                case SimpleCommands.PICTURE_MODE_HLG_LL:
+                    res = await jvc.send_command(
+                        "operation", code=const.PICTURE_MODE_HLG_LL
+                    )
+                    asyncio.create_task(jvc.update_sensor("picture_mode"))
                 case SimpleCommands.LOW_LATENCY_ON:
                     res = await jvc.send_command("operation", code=const.LOW_LATENCY_ON)
                     asyncio.create_task(jvc.update_sensor("low_latency"))
