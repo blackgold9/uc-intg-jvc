@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, Final
+
 from jvcprojector import command
 from jvcprojector.command.base import Command
 
@@ -48,7 +49,9 @@ QUERY_LOW_LATENCY: Final = command.LowLatencyMode
 QUERY_MASK: Final = command.Mask
 QUERY_LAMP_POWER: Final = command.LightPower
 QUERY_LENS_APERTURE: Final = command.IntelligentLensAperture
-QUERY_LENS_MEMORY: Final = command.InstallationMode  # Note: Read-only, no query available in protocol
+QUERY_LENS_MEMORY: Final = (
+    command.InstallationMode
+)  # Note: Read-only, no query available in protocol
 
 SENSORS: Final[tuple[SensorConfig, ...]] = (
     SensorConfig(identifier="input", name="Input Source", query_command=QUERY_INPUT),
@@ -96,12 +99,24 @@ PICTURE_MODE_USER4: Final = (command.PictureMode, command.PictureMode.USER_4)
 PICTURE_MODE_USER5: Final = (command.PictureMode, command.PictureMode.USER_5)
 PICTURE_MODE_USER6: Final = (command.PictureMode, command.PictureMode.USER_6)
 PICTURE_MODE_HLG: Final = (command.PictureMode, command.PictureMode.HLG)
-PICTURE_MODE_FRAME_ADAPT_HDR: Final = (command.PictureMode, command.PictureMode.FRAME_ADAPT_HDR)
-PICTURE_MODE_FRAME_ADAPT_HDR2: Final = (command.PictureMode, command.PictureMode.FRAME_ADAPT_HDR2)
-PICTURE_MODE_FRAME_ADAPT_HDR3: Final = (command.PictureMode, command.PictureMode.FRAME_ADAPT_HDR3)
+PICTURE_MODE_FRAME_ADAPT_HDR: Final = (
+    command.PictureMode,
+    command.PictureMode.FRAME_ADAPT_HDR,
+)
+PICTURE_MODE_FRAME_ADAPT_HDR2: Final = (
+    command.PictureMode,
+    command.PictureMode.FRAME_ADAPT_HDR2,
+)
+PICTURE_MODE_FRAME_ADAPT_HDR3: Final = (
+    command.PictureMode,
+    command.PictureMode.FRAME_ADAPT_HDR3,
+)
 PICTURE_MODE_HDR10P: Final = (command.PictureMode, command.PictureMode.HDR10_PLUS)
 PICTURE_MODE_PANA_PQ: Final = (command.PictureMode, command.PictureMode.PANA_PQ)
-PICTURE_MODE_FILMMAKER: Final = (command.PictureMode, command.PictureMode.FILMMAKER_MODE)
+PICTURE_MODE_FILMMAKER: Final = (
+    command.PictureMode,
+    command.PictureMode.FILMMAKER_MODE,
+)
 PICTURE_MODE_VIVID: Final = (command.PictureMode, command.PictureMode.VIVID)
 PICTURE_MODE_NATURAL_LL: Final = (command.PictureMode, command.PictureMode.NATURAL_LL)
 PICTURE_MODE_HDR10_LL: Final = (command.PictureMode, command.PictureMode.HDR10_LL)
@@ -119,9 +134,18 @@ LAMP_LOW: Final = (command.LightPower, command.LightPower.LOW)
 LAMP_MID: Final = (command.LightPower, command.LightPower.MID)
 LAMP_HIGH: Final = (command.LightPower, command.LightPower.HIGH)
 
-LENS_APERTURE_OFF: Final = (command.IntelligentLensAperture, command.IntelligentLensAperture.OFF)
-LENS_APERTURE_AUTO1: Final = (command.IntelligentLensAperture, command.IntelligentLensAperture.AUTO_1)
-LENS_APERTURE_AUTO2: Final = (command.IntelligentLensAperture, command.IntelligentLensAperture.AUTO_2)
+LENS_APERTURE_OFF: Final = (
+    command.IntelligentLensAperture,
+    command.IntelligentLensAperture.OFF,
+)
+LENS_APERTURE_AUTO1: Final = (
+    command.IntelligentLensAperture,
+    command.IntelligentLensAperture.AUTO_1,
+)
+LENS_APERTURE_AUTO2: Final = (
+    command.IntelligentLensAperture,
+    command.IntelligentLensAperture.AUTO_2,
+)
 
 LENS_ANIMORPHIC_OFF: Final = (command.Anamorphic, command.Anamorphic.OFF)
 LENS_ANIMORPHIC_A: Final = (command.Anamorphic, command.Anamorphic.A)

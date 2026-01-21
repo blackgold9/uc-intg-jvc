@@ -153,9 +153,13 @@ class JVCMediaPlayer(MediaPlayer, FrameworkEntity):
                 case SimpleCommands.REMOTE_MODE_3:
                     res = await jvc.send_command("remote", code=command.Remote.MODE_3)
                 case SimpleCommands.REMOTE_LENS_AP:
-                    res = await jvc.send_command("remote", code=command.Remote.LENS_APERTURE)
+                    res = await jvc.send_command(
+                        "remote", code=command.Remote.LENS_APERTURE
+                    )
                 case SimpleCommands.REMOTE_ANAMO:
-                    res = await jvc.send_command("remote", code=command.Remote.ANAMORPHIC)
+                    res = await jvc.send_command(
+                        "remote", code=command.Remote.ANAMORPHIC
+                    )
                 case SimpleCommands.REMOTE_GAMMA:
                     res = await jvc.send_command("remote", code=command.Remote.GAMMA)
                 case SimpleCommands.REMOTE_COLOR_TEMP:
@@ -167,7 +171,9 @@ class JVCMediaPlayer(MediaPlayer, FrameworkEntity):
                         "remote", code=command.Remote.V3D_FORMAT
                     )
                 case SimpleCommands.REMOTE_PIC_ADJ:
-                    res = await jvc.send_command("remote", code=command.Remote.PICTURE_ADJUST)
+                    res = await jvc.send_command(
+                        "remote", code=command.Remote.PICTURE_ADJUST
+                    )
                 case SimpleCommands.REMOTE_NATURAL:
                     res = await jvc.send_command("remote", code=command.Remote.NATURAL)
                 case SimpleCommands.REMOTE_CINEMA:
