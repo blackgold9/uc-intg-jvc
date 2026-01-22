@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, Final
 
+from jvcprojector import command
+from jvcprojector.command.base import Command
+
 
 @dataclass
 class JVCConfig:
@@ -27,8 +30,8 @@ class SensorConfig:
     """Unique identifier for the sensor (e.g., 'picture_mode'). Also used as key in state_dict."""
     name: str
     """Human-readable name for the sensor."""
-    query_command: str | None = None
-    """Query command to retrieve sensor value (e.g., 'PMPM' for picture mode)."""
+    query_command: type[Command] | None = None
+    """Query command to retrieve sensor value (e.g., command.PictureMode)."""
     unit: str | None = None
     """Unit of measurement (optional)."""
     default: str = ""
@@ -40,13 +43,15 @@ class SensorConfig:
 
 
 # Query command codes for sensors
-QUERY_INPUT: Final = "IP"
-QUERY_PICTURE_MODE: Final = "PMPM"
-QUERY_LOW_LATENCY: Final = "PMLL"
-QUERY_MASK: Final = "ISMA"
-QUERY_LAMP_POWER: Final = "PMLP"
-QUERY_LENS_APERTURE: Final = "PMDI"
-QUERY_LENS_MEMORY: Final = "INML"  # Note: Read-only, no query available in protocol
+QUERY_INPUT: Final = command.Input
+QUERY_PICTURE_MODE: Final = command.PictureMode
+QUERY_LOW_LATENCY: Final = command.LowLatencyMode
+QUERY_MASK: Final = command.Mask
+QUERY_LAMP_POWER: Final = command.LightPower
+QUERY_LENS_APERTURE: Final = command.IntelligentLensAperture
+QUERY_LENS_MEMORY: Final = (
+    command.InstallationMode
+)  # Note: Read-only, no query available in protocol
 
 SENSORS: Final[tuple[SensorConfig, ...]] = (
     SensorConfig(identifier="input", name="Input Source", query_command=QUERY_INPUT),
@@ -71,48 +76,82 @@ SENSORS: Final[tuple[SensorConfig, ...]] = (
     ),
 )
 
-LENS_MEMORY_1: Final = "INML0"
-LENS_MEMORY_2: Final = "INML1"
-LENS_MEMORY_3: Final = "INML2"
-LENS_MEMORY_4: Final = "INML3"
-LENS_MEMORY_5: Final = "INML4"
-LENS_MEMORY_6: Final = "INML5"
-LENS_MEMORY_7: Final = "INML6"
-LENS_MEMORY_8: Final = "INML7"
-LENS_MEMORY_9: Final = "INML8"
-LENS_MEMORY_10: Final = "INML9"
-PICTURE_MODE_FILM: Final = "PMPM00"
-PICTURE_MODE_CINEMA: Final = "PMPM01"
-PICTURE_MODE_NATURAL: Final = "PMPM03"
-PICTURE_MODE_HDR10: Final = "PMPM04"
-PICTURE_MODE_THX: Final = "PMPM06"
-PICTURE_MODE_USER1: Final = "PMPM0C"
-PICTURE_MODE_USER2: Final = "PMPM0D"
-PICTURE_MODE_USER3: Final = "PMPM0E"
-PICTURE_MODE_USER4: Final = "PMPM0F"
-PICTURE_MODE_USER5: Final = "PMPM10"
-PICTURE_MODE_USER6: Final = "PMPM11"
-PICTURE_MODE_HLG: Final = "PMPM14"
-PICTURE_MODE_FRAME_ADAPT_HDR: Final = "PMPM0B"
-PICTURE_MODE_HDR10P: Final = "PMPM15"
-PICTURE_MODE_PANA_PQ: Final = "PMPM16"
-LOW_LATENCY_ON: Final = "PMLL1"
-LOW_LATENCY_OFF: Final = "PMLL0"
-MASK_OFF: Final = "ISMA2"
-MASK_CUSTOM1: Final = "ISMA0"
-MASK_CUSTOM2: Final = "ISMA1"
-MASK_CUSTOM3: Final = "ISMA3"
-LAMP_LOW: Final = "PMLP0"
-LAMP_MID: Final = "PMLP2"
-LAMP_HIGH: Final = "PMLP1"
-LENS_APERTURE_OFF: Final = "PMDI0"
-LENS_APERTURE_AUTO1: Final = "PMDI1"
-LENS_APERTURE_AUTO2: Final = "PMDI2"
-LENS_ANIMORPHIC_OFF: Final = "INVS0"
-LENS_ANIMORPHIC_A: Final = "INVS1"
-LENS_ANIMORPHIC_B: Final = "INVS2"
-LENS_ANIMORPHIC_C: Final = "INVS3"
-LENS_ANIMORPHIC_D: Final = "INVS4"
+LENS_MEMORY_1: Final = (command.InstallationMode, command.InstallationMode.MEMORY_1)
+LENS_MEMORY_2: Final = (command.InstallationMode, command.InstallationMode.MEMORY_2)
+LENS_MEMORY_3: Final = (command.InstallationMode, command.InstallationMode.MEMORY_3)
+LENS_MEMORY_4: Final = (command.InstallationMode, command.InstallationMode.MEMORY_4)
+LENS_MEMORY_5: Final = (command.InstallationMode, command.InstallationMode.MEMORY_5)
+LENS_MEMORY_6: Final = (command.InstallationMode, command.InstallationMode.MEMORY_6)
+LENS_MEMORY_7: Final = (command.InstallationMode, command.InstallationMode.MEMORY_7)
+LENS_MEMORY_8: Final = (command.InstallationMode, command.InstallationMode.MEMORY_8)
+LENS_MEMORY_9: Final = (command.InstallationMode, command.InstallationMode.MEMORY_9)
+LENS_MEMORY_10: Final = (command.InstallationMode, command.InstallationMode.MEMORY_10)
+
+PICTURE_MODE_FILM: Final = (command.PictureMode, command.PictureMode.FILM)
+PICTURE_MODE_CINEMA: Final = (command.PictureMode, command.PictureMode.CINEMA)
+PICTURE_MODE_NATURAL: Final = (command.PictureMode, command.PictureMode.NATURAL)
+PICTURE_MODE_HDR10: Final = (command.PictureMode, command.PictureMode.HDR10)
+PICTURE_MODE_THX: Final = (command.PictureMode, command.PictureMode.THX)
+PICTURE_MODE_USER1: Final = (command.PictureMode, command.PictureMode.USER_1)
+PICTURE_MODE_USER2: Final = (command.PictureMode, command.PictureMode.USER_2)
+PICTURE_MODE_USER3: Final = (command.PictureMode, command.PictureMode.USER_3)
+PICTURE_MODE_USER4: Final = (command.PictureMode, command.PictureMode.USER_4)
+PICTURE_MODE_USER5: Final = (command.PictureMode, command.PictureMode.USER_5)
+PICTURE_MODE_USER6: Final = (command.PictureMode, command.PictureMode.USER_6)
+PICTURE_MODE_HLG: Final = (command.PictureMode, command.PictureMode.HLG)
+PICTURE_MODE_FRAME_ADAPT_HDR: Final = (
+    command.PictureMode,
+    command.PictureMode.FRAME_ADAPT_HDR,
+)
+PICTURE_MODE_FRAME_ADAPT_HDR2: Final = (
+    command.PictureMode,
+    command.PictureMode.FRAME_ADAPT_HDR2,
+)
+PICTURE_MODE_FRAME_ADAPT_HDR3: Final = (
+    command.PictureMode,
+    command.PictureMode.FRAME_ADAPT_HDR3,
+)
+PICTURE_MODE_HDR10P: Final = (command.PictureMode, command.PictureMode.HDR10_PLUS)
+PICTURE_MODE_PANA_PQ: Final = (command.PictureMode, command.PictureMode.PANA_PQ)
+PICTURE_MODE_FILMMAKER: Final = (
+    command.PictureMode,
+    command.PictureMode.FILMMAKER_MODE,
+)
+PICTURE_MODE_VIVID: Final = (command.PictureMode, command.PictureMode.VIVID)
+PICTURE_MODE_NATURAL_LL: Final = (command.PictureMode, command.PictureMode.NATURAL_LL)
+PICTURE_MODE_HDR10_LL: Final = (command.PictureMode, command.PictureMode.HDR10_LL)
+PICTURE_MODE_HLG_LL: Final = (command.PictureMode, command.PictureMode.HLG_LL)
+
+LOW_LATENCY_ON: Final = (command.LowLatencyMode, command.LowLatencyMode.ON)
+LOW_LATENCY_OFF: Final = (command.LowLatencyMode, command.LowLatencyMode.OFF)
+
+MASK_OFF: Final = (command.Mask, command.Mask.OFF)
+MASK_CUSTOM1: Final = (command.Mask, command.Mask.CUSTOM_1)
+MASK_CUSTOM2: Final = (command.Mask, command.Mask.CUSTOM_2)
+MASK_CUSTOM3: Final = (command.Mask, command.Mask.CUSTOM_3)
+
+LAMP_LOW: Final = (command.LightPower, command.LightPower.LOW)
+LAMP_MID: Final = (command.LightPower, command.LightPower.MID)
+LAMP_HIGH: Final = (command.LightPower, command.LightPower.HIGH)
+
+LENS_APERTURE_OFF: Final = (
+    command.IntelligentLensAperture,
+    command.IntelligentLensAperture.OFF,
+)
+LENS_APERTURE_AUTO1: Final = (
+    command.IntelligentLensAperture,
+    command.IntelligentLensAperture.AUTO_1,
+)
+LENS_APERTURE_AUTO2: Final = (
+    command.IntelligentLensAperture,
+    command.IntelligentLensAperture.AUTO_2,
+)
+
+LENS_ANIMORPHIC_OFF: Final = (command.Anamorphic, command.Anamorphic.OFF)
+LENS_ANIMORPHIC_A: Final = (command.Anamorphic, command.Anamorphic.A)
+LENS_ANIMORPHIC_B: Final = (command.Anamorphic, command.Anamorphic.B)
+LENS_ANIMORPHIC_C: Final = (command.Anamorphic, command.Anamorphic.C)
+LENS_ANIMORPHIC_D: Final = (command.Anamorphic, command.Anamorphic.D)
 
 
 class SimpleCommands(StrEnum):
@@ -141,8 +180,15 @@ class SimpleCommands(StrEnum):
     PICTURE_MODE_USER6 = "Picture Mode User 6"
     PICTURE_MODE_HLG = "Picture Mode HLG"
     PICTURE_MODE_FRAME_ADAPT_HDR = "Picture Mode Frame Adapt HDR"
+    PICTURE_MODE_FRAME_ADAPT_HDR2 = "Picture Mode Frame Adapt HDR 2"
+    PICTURE_MODE_FRAME_ADAPT_HDR3 = "Picture Mode Frame Adapt HDR 3"
     PICTURE_MODE_HDR10P = "Picture Mode HDR10P"
     PICTURE_MODE_PANA_PQ = "Picture Mode PANA PQ"
+    PICTURE_MODE_FILMMAKER = "Picture Mode Filmmaker"
+    PICTURE_MODE_VIVID = "Picture Mode Vivid"
+    PICTURE_MODE_NATURAL_LL = "Picture Mode Natural (Low Latency)"
+    PICTURE_MODE_HDR10_LL = "Picture Mode HDR10 (Low Latency)"
+    PICTURE_MODE_HLG_LL = "Picture Mode HLG (Low Latency)"
     LOW_LATENCY_ON = "Low Latency On"
     LOW_LATENCY_OFF = "Low Latency Off"
     MASK_OFF = "Mask Off"

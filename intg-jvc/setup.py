@@ -5,6 +5,7 @@ from ipaddress import ip_address
 from typing import Any
 
 from const import JVCConfig
+from jvcprojector import command
 from jvcprojector.projector import JvcProjector
 from ucapi import IntegrationSetupError, RequestUserInput, SetupError
 from ucapi_framework import BaseSetupFlow
@@ -121,13 +122,20 @@ class JVCSetupFlow(BaseSetupFlow[JVCConfig]):
             jvc = JvcProjector(address, password=password)
             try:
                 await jvc.connect()
-                info = await jvc.get_info()
+                model = jvc.model
+                # Get MAC address as identifier
+                try:
+                    mac = await jvc.get(command.MacAddress)
+                except Exception:  # pylint: disable=broad-except
+                    mac = None
             finally:
                 await jvc.disconnect()
-            _LOG.debug("JVC Projector info: %s", info)
+
+            identifier = mac if mac else model
+            _LOG.debug("JVC Projector info: %s %s", model, identifier)
 
             return JVCConfig(
-                identifier=info.get("mac", info.get("model", "jvc")),
+                identifier=identifier,
                 name=name,
                 address=address,
                 password=password,
