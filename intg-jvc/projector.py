@@ -10,8 +10,8 @@ from typing import Any
 
 import aiohttp
 from const import (
-    JVCConfig,
     SENSORS,
+    JVCConfig,
     SensorConfig,
 )
 from jvcprojector import const as JvcConst
@@ -205,9 +205,11 @@ class JVCProjector(StatelessHTTPDevice):
         # Use 'is not None' check to allow empty strings as valid values
         return SensorAttributes(
             STATE=sensor_state,
-            VALUE=value
-            if self.state == media_player.States.ON and value is not None
-            else sensor_config.default,
+            VALUE=(
+                value
+                if self.state == media_player.States.ON and value is not None
+                else sensor_config.default
+            ),
             UNIT=sensor_config.unit,
         )
 
@@ -299,23 +301,12 @@ class JVCProjector(StatelessHTTPDevice):
 
             match command:
                 case "powerOn":
-                    power = await self._jvc_projector.get_power()
-                    # Normalize power state from API
-                    power_state = self._convert_power_state(str(power))
-                    if power_state in [
-                        media_player.States.STANDBY,
-                        media_player.States.OFF,
-                    ]:
-                        await self._jvc_projector.power_on()
+                    await self._jvc_projector.power_on()
                     self._state = media_player.States.ON
                     self.attributes.STATE = media_player.States.ON
 
                 case "powerOff":
-                    power = await self._jvc_projector.get_power()
-                    # Normalize power state from API
-                    power_state = self._convert_power_state(str(power))
-                    if power_state == media_player.States.ON:
-                        await self._jvc_projector.power_off()
+                    await self._jvc_projector.power_off()
                     self._state = media_player.States.STANDBY
                     self.attributes.STATE = media_player.States.STANDBY
 
