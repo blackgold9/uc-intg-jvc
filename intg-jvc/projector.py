@@ -10,8 +10,8 @@ from typing import Any
 
 import aiohttp
 from const import (
-    SENSORS,
     JVCConfig,
+    SENSORS,
     SensorConfig,
 )
 from jvcprojector import const as JvcConst
